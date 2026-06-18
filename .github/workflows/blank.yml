@@ -46,7 +46,7 @@ jobs:
  
       - name: Publish to Exchange
         run: |
-          mvn deploy --settings .settings/settings.xml -DskipMunitTests \
+          mvn deploy --settings settings/settings.xml -DskipMunitTests \
           -Danypoint.user="${{secrets.USER}}" \
           -Danypoint.pw="${{secrets.PASS}}"
   deploydev:

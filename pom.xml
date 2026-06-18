@@ -44,7 +44,7 @@
 						<businessGroupId>ac263803-a388-46ee-b7bc-9ed582e05fff</businessGroupId>
 						<environment>Sandbox</environment>
 						<target>Cloudhub-US-East-2</target>
-						<applicationName>teddy-demo-maven</applicationName>
+						<applicationName>batch-job</applicationName>
 						<replicas>1</replicas>
 						<vCores>0.1</vCores>
 

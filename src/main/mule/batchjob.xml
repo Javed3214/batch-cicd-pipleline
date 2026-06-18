@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f292e9b7-d962-4f8a-b5be-5c429b061dcd" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="batchjobFlow" doc:id="a44dfe8f-3bc1-4e01-acfa-c2485e6ab813" >
+		<http:listener doc:name="Listener" doc:id="228b2fb4-309c-43b5-8637-62e649f45931" config-ref="HTTP_Listener_config" path="/batch"/>
+		<ee:transform doc:name="Transform Message" doc:id="a5fdb956-7ec1-49e7-adcb-c6430e74e63b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[
+  {
+    "name": "Aarav Sharma",
+    "place": "Hyderabad",
+    "department": "IT",
+    "country": "India"
+  },
+  {
+    "name": "Emily Johnson",
+    "place": "New York",
+    "department": "Finance",
+    "country": "India"
+  },
+  {
+    "name": "Liam Brown",
+    "place": "London",
+    "department": "HR",
+    "country": "India"
+  },
+  {
+    "name": "Noah Garcia",
+    "place": "Madrid",
+    "department": "Marketing",
+    "country": "Spain"
+  },
+  {
+    "name": "Sophia Müller",
+    "place": "Berlin",
+    "department": "Engineering",
+    "country": "Germany"
+  }
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<batch:job jobName="batchjobBatch_Job" doc:id="51d87ae4-e4ea-422c-8322-b4a1fc8df1d4" maxFailedRecords="-1">
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="9744fb30-1e7e-46d9-96a4-89cc38efeabc" acceptPolicy="ALL">
+					<choice doc:name="Choice" doc:id="bfeed1b0-0396-4b29-aa6e-68c362e26d23" >
+						<when expression='#[payload.country == "India"]'>
+							<ee:transform doc:name="Transform Message" doc:id="994d65c7-17cf-4f30-b66f-d3f9e385c1e6" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload ++ {"CountryCode": "+91"}]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</when>
+						<otherwise>
+							<raise-error doc:name="Raise error" doc:id="5d2c6959-69de-4574-8e96-9f4f252a33aa" type="COUNTRY: NOT_INDIA"/>
+						</otherwise>
+					</choice>
+				</batch:step>
+				<batch:step name="Batch_Step1" doc:id="bc4b2d3d-2733-42c4-8b99-4bf6594cb5bf" acceptPolicy="ONLY_FAILURES">
+					<ee:transform doc:name="Transform Message" doc:id="4dc10502-436c-49f3-abb6-26d98f4d6de3" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<logger level="INFO" doc:name="Logger" doc:id="8282a948-003b-4332-9b5e-7188b3ca8888" message="#[payload]"/>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<ee:transform doc:name="Transform Message" doc:id="eb832473-2f9f-459c-b450-33c4adeef9af" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+</mule>

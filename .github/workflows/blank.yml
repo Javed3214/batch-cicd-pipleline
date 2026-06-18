@@ -79,7 +79,7 @@ jobs:
  
       - name: Deploy to dev
         run: |
-          mvn deploy --settings .settings/settings.xml -DskipMunitTests -DmuleDeploy \
+          mvn deploy --settings settings/settings.xml -DskipMunitTests -DmuleDeploy \
           -Danypoint.user="${{secrets.USER}}" \
           -Danypoint.pw="${{secrets.PASS}}" \
           -Danypoint.businessGroup="${{secrets.ANY_POINT_ID}}" \
